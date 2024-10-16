@@ -25,6 +25,15 @@ def compress_logs(log_directory, archive_directory):
         log.write(f"{datetime.now()}: Archived logs from {log_directory} to {archive_path}\n")
 
     print(f"Logs archived successfully to {archive_path}")
+    upload_to_s3(archive_path, "my-log-archives-bucket")
+
+def upload_to_s3(archive_path, bucket_name):
+    try:
+        command = f"aws s3 cp {archive_path} s3://{bucket_name}/"
+        subprocess.run(command, shell=True, check=True)
+        print(f"Successfully uploaded {archive_path} to s3://{bucket_name}/")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to upload to S3: {e}")
 
 def main():
     # Check if the correct number of arguments are provided
